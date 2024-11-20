@@ -1,53 +1,44 @@
 import {Request, Response} from 'express'
 import viewRoutes from './routes/view';
 import path from 'path';
+import http from 'http';
 
+const WebSocketServer = require('ws');
 const express = require('express');
-const multer = require('multer');
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
-// Configurar multer para manejar archivos
-const storage = multer.memoryStorage();
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5 // Límite de 5MB
-  },
-  fileFilter: (req: any, file: any, cb: any) => {
-    // Aceptar solo imágenes
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
-  }
+
+wss.on('connection', (ws: any) => {
+  console.log('Client connected via WebSocket');
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
 });
-app.get('/hi', (req: any, res: any) => {
-  console.log("Hello there");
-  res.send("helo");
-})
-app.post("/test", (req: Request, res: any) => {
-  console.log("SUCCESS!!!!");
-  console.log(req.headers);
-  console.log(req.body);
-  
-  res.send(req.body +"!");
-})
+
 
 // Endpoint para recibir imágenes
 app.post('/upload', express.raw({ type: 'image/jpeg', limit: '10mb' }), (req: Request, res: Response) => {
   try {
     if (!req.body || req.body.length === 0) {
-      return res.status(400).send('No se recibió ninguna imagen');
+      return res.status(400).send('No image received');
     }
 
-    console.log('Imagen recibida. Tamaño:', req.body.length);
+    console.log('Image received. Size:', req.body.length);
 
-    // You can process the image buffer `req.body` here
-    res.status(200).send('Imagen recibida correctamente');
+    // Broadcast the image to all connected WebSocket clients
+    wss.clients.forEach((client: any) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(req.body); // Send the raw image buffer
+      }
+    });
+
+    res.status(200).send('Image broadcasted successfully');
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).send('Error al procesar la imagen');
+    res.status(500).send('Error processing the image');
   }
 });
 
