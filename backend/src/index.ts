@@ -16,6 +16,7 @@ app.get('/hi', (req: any, res: any) => {
 })
 app.post("/test", (req: Request, res: any) => {
   console.log("SUCCESS!!!!");
+  console.log(req.headers);
   console.log(req.body);
   
   res.send(req.body +"!");
