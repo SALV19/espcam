@@ -8,6 +8,15 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+app.get('/hi', (req: any, res: any) => {
+  console.log("Hello there");
+  res.send("helo");
+})
+app.post("/test", (req: any, res: any) => {
+  console.log("SUCCESS!!!!");
+  res.send("TEST connection successfully!");
+})
+
 // Endpoint para recibir imágenes
 app.post('/upload', upload.single('image'), (req: any, res: any) => {
   try {
