@@ -1,75 +1,34 @@
-import {Request, Response} from "express";
-import viewRoutes from "./routes/view";
-import {Server} from "socket.io"
+import {Request, Response} from 'express'
 
-const express = require("express");
-const path = require("path");
-const http = require("http");
-const bodyParser = require('body-parser');
-const fs = require("fs");
-const dotenv = require("dotenv");
-const cors = require("cors");
-dotenv.config();
-
+const express = require('express');
+const multer = require('multer');
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Allow all origins for testing. You can replace this with specific URLs later.
-    methods: ["GET", "POST"]
-  }
-})
 
-app.use(cors());
+// Configurar multer para manejar archivos
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-// Set view engine
-app.set("view engine", "ejs");
-
-// Use path.join to set the views directory
-app.set("views", path.join(__dirname, "../../frontend"));
-app.get("/", viewRoutes);
-
-app.get('/hi', (req: Request, res: Response) => {
-  res.send('Hello World'); // Respuesta al cliente
-});
-
-app.use(bodyParser.raw({ type: 'image/jpeg', limit: '10mb' }));
-
-app.post('/upload', (req: Request, res: Response) => {
-  const imageBuffer = Buffer.from(req.body); // Convert to Buffer
-
-  // Save the image (optional)
-  fs.writeFile('received_image.jpg', imageBuffer, (err: Error) => {
-    if (err) {
-      return res.status(500).send('Error saving image');
+// Endpoint para recibir imágenes
+app.post('/upload', upload.single('image'), (req: any, res: any) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No se recibió ninguna imagen');
     }
-    console.log('Image received and saved successfully');
-  });
-
-  // Broadcast the image to all connected clients
-  io.emit('newImage', imageBuffer.toString('base64'));
-
-  res.send('Image received successfully');
-});
-app.get('/hello_there', (req: Request, res: Response) => {
-  console.log("General Kenobi");
-})
-
-// WebSocket para recibir la imagen
-io.on("connection", (socket: any) => {
-  console.log("A user connected");
-
-  socket.on("frame", (frameData: any) => {
-    socket.broadcast.emit("frame", frameData);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
+    
+    console.log('Imagen recibida. Tamaño:', req.file.size);
+    res.status(200).send('Imagen recibida correctamente');
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Error al procesar la imagen');
+  }
 });
 
-server.listen(process.env.SERVER_PORT, () => {
-  console.log("Server is running on http://localhost:" + process.env.SERVER_PORT);
+// Endpoint de prueba
+app.get('/', (req: any, res: any) => {
+  res.send('Servidor funcionando correctamente');
 });
 
-
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en puerto ${PORT}`);
+});
