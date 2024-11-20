@@ -1,4 +1,6 @@
 import {Request, Response} from 'express'
+import viewRoutes from './routes/view';
+import path from 'path';
 
 const express = require('express');
 const multer = require('multer');
@@ -14,7 +16,9 @@ app.get('/hi', (req: any, res: any) => {
 })
 app.post("/test", (req: any, res: any) => {
   console.log("SUCCESS!!!!");
-  res.send("TEST connection successfully!");
+  console.log(req);
+  
+  res.send(req +"!");
 })
 
 // Endpoint para recibir imágenes
@@ -33,9 +37,11 @@ app.post('/upload', upload.single('image'), (req: any, res: any) => {
 });
 
 // Endpoint de prueba
-app.get('/', (req: any, res: any) => {
-  res.send('Servidor funcionando correctamente');
-});
+app.set("view engine", "ejs");
+
+// Use path.join to set the views directory
+app.set("views", path.join(__dirname, "../../frontend"));
+app.get("/", viewRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
