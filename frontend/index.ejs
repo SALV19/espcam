@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Viewer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Viewer with WebSocket</title>
 </head>
 <body>
   <h1>Cam</h1>
-  <img id="image-display" alt="Received Image" style="max-width: 600px; max-height: 400px; border: 1px solid #ccc;"/>
+  <img id="image-display" alt="Received Image" style="max-width: 600px; max-height: 400px; border: 1px solid #ccc; margin-top: 20px;"/>
+
+  <script>
+    // Connect to the WebSocket server
+    const socket = new WebSocket('ws://localhost:3000');
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+      console.log('Image received via WebSocket');
+
+      // Create a Blob from the received data and set it as the image source
+      const blob = new Blob([event.data], { type: 'image/jpeg' });
+      const imageUrl = URL.createObjectURL(blob);
+
+      // Update the image source
+      document.getElementById('image-display').src = imageUrl;
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  </script>
 </body>
 </html>
