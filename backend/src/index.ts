@@ -35,19 +35,22 @@ app.post("/test", (req: Request, res: any) => {
 })
 
 // Endpoint para recibir imágenes
-app.post('/upload', upload.single('image'), (req: any, res: any) => {
+app.post('/upload', express.raw({ type: 'image/jpeg', limit: '10mb' }), (req: Request, res: Response) => {
   try {
-    if (!req.file) {
+    if (!req.body || req.body.length === 0) {
       return res.status(400).send('No se recibió ninguna imagen');
     }
-    
-    console.log('Imagen recibida. Tamaño:', req.file.size);
+
+    console.log('Imagen recibida. Tamaño:', req.body.length);
+
+    // You can process the image buffer `req.body` here
     res.status(200).send('Imagen recibida correctamente');
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Error al procesar la imagen');
   }
 });
+
 
 // Endpoint de prueba
 app.set("view engine", "ejs");
