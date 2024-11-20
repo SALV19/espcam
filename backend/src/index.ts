@@ -10,6 +10,8 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+app.use(express.text());
+
 app.get('/hi', (req: any, res: any) => {
   console.log("Hello there");
   res.send("helo");
