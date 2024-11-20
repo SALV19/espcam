@@ -14,11 +14,11 @@ app.get('/hi', (req: any, res: any) => {
   console.log("Hello there");
   res.send("helo");
 })
-app.post("/test", (req: any, res: any) => {
+app.post("/test", (req: Request, res: any) => {
   console.log("SUCCESS!!!!");
-  console.log(req);
+  console.log(req.body);
   
-  res.send(req +"!");
+  res.send(req.body +"!");
 })
 
 // Endpoint para recibir imágenes
