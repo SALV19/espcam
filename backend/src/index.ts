@@ -8,6 +8,7 @@ const http = require("http");
 const bodyParser = require('body-parser');
 const fs = require("fs");
 const dotenv = require("dotenv");
+const cors = require("cors");
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 })
+
+app.use(cors());
 
 // Set view engine
 app.set("view engine", "ejs");
@@ -48,6 +51,9 @@ app.post('/upload', (req: Request, res: Response) => {
 
   res.send('Image received successfully');
 });
+app.get('/hello_there', (req: Request, res: Response) => {
+  console.log("General Kenobi");
+})
 
 // WebSocket para recibir la imagen
 io.on("connection", (socket: any) => {
