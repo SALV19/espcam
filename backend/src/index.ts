@@ -8,8 +8,20 @@ const app = express();
 
 // Configurar multer para manejar archivos
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5 // Límite de 5MB
+  },
+  fileFilter: (req: any, file: any, cb: any) => {
+    // Aceptar solo imágenes
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  }
+});
 app.get('/hi', (req: any, res: any) => {
   console.log("Hello there");
   res.send("helo");
