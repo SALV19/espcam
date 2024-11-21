@@ -1,23 +1,29 @@
 import {Request, Response} from 'express'
 import viewRoutes from './routes/view';
 import path from 'path';
-import http from 'http';
+import fs from 'fs';
 
-const WebSocketServer = require('ws');
 const express = require('express');
 const app = express();
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
 
+const UPLOAD_DIR = path.join(__dirname, '/uploads'); // Directory to store images
 
-wss.on('connection', (ws: any) => {
-  console.log('Client connected via WebSocket');
+// Ensure the upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR);
+}
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
+app.get("/uploads/:filename", (req:Request, res: Response) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, "uploads", filename);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(500).send("Error sending the file");
+    }
   });
 });
-
 
 // Endpoint para recibir imágenes
 app.post('/upload', express.raw({ type: 'image/jpeg', limit: '10mb' }), (req: Request, res: Response) => {
@@ -27,21 +33,18 @@ app.post('/upload', express.raw({ type: 'image/jpeg', limit: '10mb' }), (req: Re
     }
 
     console.log('Image received. Size:', req.body.length);
+    const imageName = 'img.jpg';
+    const imagePath = path.join(UPLOAD_DIR, imageName);
 
-    // Broadcast the image to all connected WebSocket clients
-    wss.clients.forEach((client: any) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(req.body); // Send the raw image buffer
-      }
-    });
-
-    res.status(200).send('Image broadcasted successfully');
+    // Save the image to the uploads directory
+    fs.writeFileSync(imagePath, req.body);
+    res.status(200).send("Success!");
+    
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Error processing the image');
   }
 });
-
 
 // Endpoint de prueba
 app.set("view engine", "ejs");
@@ -52,5 +55,5 @@ app.get("/", viewRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`);
+  console.log(`Server online in: http://localhost:${PORT}`);
 });
