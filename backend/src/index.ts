@@ -61,7 +61,7 @@ app.post(
       }
 
       console.log("Image received. Size:", req.body.length);
-      const imageName = "img.jpg";
+      const imageName = "received_image.jpg";
       const imagePath = path.join(UPLOAD_DIR, imageName);
 
       // Save the image to the uploads directory
