@@ -92,8 +92,8 @@
         fetch("http://localhost:3000/whereAmI")
           .then((response) => response.text())
           .then((data) => {
-            resultDiv.textContent = data;
-            console.log("Respuesta:", data);
+            resultDiv.textContent = data == "structure" ? "borrego" : data;
+            console.log("Respuesta:", data == "structure" ? "borrego" : data);
           })
           .catch((error) => {
             resultDiv.textContent = "Error: " + error;
@@ -104,8 +104,15 @@
       document
         .getElementById("guiameBtn")
         .addEventListener("click", function () {
-          const resultDiv = document.getElementById("result");
-          resultDiv.textContent = "Generando ruta...";
+          const location = document.querySelector("#result");
+          console.log();
+          if (
+            location.textContent == "borrego" ||
+            location.textContent == "welcome"
+          )
+            window.location.href = `/${location.textContent}`;
+          // const resultDiv = document.getElementById("result");
+          // resultDiv.textContent = "Generando ruta...";
           // Agrega aquí la lógica que necesites para el botón Guíame
         });
     </script>
