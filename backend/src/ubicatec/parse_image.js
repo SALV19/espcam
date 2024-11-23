@@ -1,5 +1,6 @@
 const { createCanvas, loadImage } = require("canvas");
 const fs = require("fs");
+const path = require("path");
 const { exec } = require("child_process");
 
 async function extractImageData(imagePath) {
@@ -18,7 +19,6 @@ async function extractImageData(imagePath) {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     
     // Convert RGBA data to the format expected by the model
-    // This assumes the model expects normalized RGB values
     const features = [];
     for (let i = 0; i < imageData.data.length; i += 4) {
       // Convert RGB values to normalized floats (0-1)
@@ -35,37 +35,37 @@ async function extractImageData(imagePath) {
   }
 }
 
-// Run the function
 async function main() {
-  const imagePath = "../uploads/test_img.jpg"; // Replace with your image path
+  // Rutas basadas en la estructura actual del proyecto
+  const imagePath = path.join(__dirname, 'received_image.jpg');
+  const runImpulsePath = path.join(__dirname, 'run-impulse.js');
+  const featuresPath = path.join(__dirname, 'raw_features.txt');
   
   if (fs.existsSync(imagePath)) {
     try {
+      console.log('Processing image...');
       const features = await extractImageData(imagePath);
       
       // Convert features array to comma-separated string
       const featuresString = features.join(',');
       
-      // Save features to a temporary file
-      const tempFilePath = './temp_features.txt';
-      fs.writeFileSync(tempFilePath, featuresString);
+      // Save features to raw_features.txt
+      fs.writeFileSync(featuresPath, featuresString);
+      console.log('Features saved to raw_features.txt');
       
       // Run the classifier with the features file
-      const command = `node run-impulse.js ${tempFilePath}`;
+      const command = `node "${runImpulsePath}" "${featuresPath}"`;
       
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          console.error(`Error executing script: ${error.message}`);
+          console.error(`Error executing classifier: ${error.message}`);
           return;
         }
         if (stderr) {
-          console.error(`Script stderr: ${stderr}`);
+          console.error(`Classifier stderr: ${stderr}`);
           return;
         }
-        console.log(`Script output:\n${stdout}`);
-        
-        // Clean up temporary file
-        fs.unlinkSync(tempFilePath);
+        console.log(`Classifier output:\n${stdout}`);
       });
     } catch (error) {
       console.error("Failed to process image:", error);
