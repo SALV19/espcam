@@ -16,9 +16,13 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 
 app.get("/whereAmI", (req: Request, res: Response) => {
   try {
-    const img_rec = imageRecognition().then((e: any) => e);
-    console.log("Where am I: " + img_rec);
-    res.status(200).send("success: ");
+    const get = async () => {
+      const response = await imageRecognition().then((e: any) => e);
+      console.log(typeof response);
+      // const resObj = JSON.parse(response);
+      res.status(200).send("success2: " + response);
+    };
+    get();
   } catch (error) {
     res.status(400).send("error: " + error);
   }

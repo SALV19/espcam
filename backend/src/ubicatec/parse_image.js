@@ -150,19 +150,26 @@ async function imageRecognition() {
     console.log("\nRunning classifier...");
     const command = `node "${runImpulsePath}" "${featuresPath}"`;
 
-    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
-      if (error) {
-        console.error("Error running classifier:", error);
-        return;
-      }
-      if (stderr) {
-        console.log("Classifier info:", stderr);
-      }
-      if (stdout) {
-        console.log("Classifier output:\n", stdout);
-        return stdout;
-      }
+    const execPromise = new Promise((resolve, reject) => {
+      exec(
+        command,
+        { maxBuffer: 1024 * 1024 * 10 },
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error("Error running classifier:", error);
+            return;
+          }
+          if (stderr) {
+            console.log("Classifier info:", stderr);
+          }
+          if (stdout) {
+            // console.log("Classifier output:\n", stdout);
+            resolve(stdout);
+          }
+        },
+      );
     });
+    return await execPromise;
   } catch (error) {
     console.error("Failed to process image:", error);
     if (error.stack) {

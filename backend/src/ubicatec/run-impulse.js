@@ -174,16 +174,16 @@ let classifier = new EdgeImpulseClassifier();
 classifier
   .init()
   .then(async () => {
-    let project = classifier.getProjectInfo();
-    console.log(
-      "Running inference for",
-      project.owner +
-        " / " +
-        project.name +
-        " (version " +
-        project.deploy_version +
-        ")",
-    );
+    // let project = classifier.getProjectInfo();
+    // console.log(
+    //   "Running inference for",
+    //   project.owner +
+    //     " / " +
+    //     project.name +
+    //     " (version " +
+    //     project.deploy_version +
+    //     ")",
+    // );
 
     let result = classifier.classify(
       features
@@ -192,7 +192,7 @@ classifier
         .map((n) => Number(n)),
     );
 
-    console.log(result.results);
+    console.log(result);
   })
   .catch((err) => {
     console.error("Failed to initialize classifier", err);
