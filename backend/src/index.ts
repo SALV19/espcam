@@ -79,13 +79,7 @@ app.set("view engine", "ejs");
 
 // Use path.join to set the views directory
 app.set("views", path.join(__dirname, "../../frontend/views"));
-app.get("/", viewRoutes);
-app.get("/borrego", (req: any, res: any) => {
-  res.render("borrego_cosmico", { title: "Get Photo" });
-});
-app.get("/welcome", (req: any, res: any) => {
-  res.render("welcome_center", { title: "Get Photo" });
-});
+app.use("/", viewRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
