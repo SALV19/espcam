@@ -18,9 +18,14 @@ app.get("/whereAmI", (req: Request, res: Response) => {
   try {
     const get = async () => {
       const response = await imageRecognition().then((e: any) => e);
-      console.log(typeof response);
+      const startIndex = response.indexOf("'") + 1; // +1 to exclude the start character
+      const endIndex = response.indexOf(",", startIndex) - 1;
+
+      const answer = response.substring(startIndex, endIndex);
+      console.log(answer);
+
       // const resObj = JSON.parse(response);
-      res.status(200).send("success2: " + response);
+      res.status(200).send("success2: " + answer);
     };
     get();
   } catch (error) {
