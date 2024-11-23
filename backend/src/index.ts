@@ -7,7 +7,7 @@ const imageRecognition = require("./ubicatec/parse_image");
 const express = require("express");
 const app = express();
 
-const UPLOAD_DIR = path.join(__dirname, "/uploads"); // Directory to store images
+const UPLOAD_DIR = path.join(__dirname, "/ubicatec"); // Directory to store images
 
 app.use(
   "/scripts",
