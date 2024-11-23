@@ -73,7 +73,7 @@ app.post(
 app.set("view engine", "ejs");
 
 // Use path.join to set the views directory
-app.set("views", path.join(__dirname, "../../frontend"));
+app.set("views", path.join(__dirname, "../../frontend/views"));
 app.get("/", viewRoutes);
 
 const PORT = process.env.PORT || 3000;

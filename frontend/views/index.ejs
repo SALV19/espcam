@@ -14,7 +14,7 @@
         UbicaTec
       </h1>
       <button
-        onclick="window.location.href='/get_photo'"
+        onclick="analyzeImg()"
         class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out flex items-center justify-center space-x-2"
       >
         <svg
@@ -47,4 +47,5 @@
       }
     </style>
   </body>
+  <%- include('../scripts/get_photo.ejs') %>
 </html>
