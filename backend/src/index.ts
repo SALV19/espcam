@@ -9,6 +9,11 @@ const app = express();
 
 const UPLOAD_DIR = path.join(__dirname, "/uploads"); // Directory to store images
 
+app.use(
+  "/scripts",
+  express.static(path.join(__dirname, "../../frontend/scripts")),
+);
+
 // Ensure the upload directory exists
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR);
@@ -25,7 +30,7 @@ app.get("/whereAmI", (req: Request, res: Response) => {
       console.log(answer);
 
       // const resObj = JSON.parse(response);
-      res.status(200).send("success2: " + answer);
+      res.status(200).send(answer);
     };
     get();
   } catch (error) {
