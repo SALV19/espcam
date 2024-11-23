@@ -192,7 +192,7 @@ classifier
         .map((n) => Number(n)),
     );
 
-    console.log(result);
+    console.log(result.results);
   })
   .catch((err) => {
     console.error("Failed to initialize classifier", err);

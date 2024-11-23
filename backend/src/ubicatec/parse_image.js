@@ -126,7 +126,7 @@ async function extractImageFeatures(imagePath) {
   }
 }
 
-async function main() {
+async function imageRecognition() {
   try {
     // Get paths
     const imagePath = path.join(__dirname, "received_image.jpg");
@@ -160,6 +160,7 @@ async function main() {
       }
       if (stdout) {
         console.log("Classifier output:\n", stdout);
+        return stdout;
       }
     });
   } catch (error) {
@@ -170,4 +171,4 @@ async function main() {
   }
 }
 
-main();
+module.exports = imageRecognition;
