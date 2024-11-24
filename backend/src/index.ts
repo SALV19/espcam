@@ -58,6 +58,7 @@ app.get("/audio", function (req: Request, res: Response) {
   }
 
   const filePath = __dirname + "/audio/" + fileId;
+  console.log(filePath);
 
   // Verificar si el archivo existe
   fs.stat(filePath, (err, stats) => {
