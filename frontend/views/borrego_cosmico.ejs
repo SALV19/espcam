@@ -9,11 +9,16 @@
   <body
     class="bg-gradient-to-br from-orange-400 via-pink-400 to-blue-500 min-h-screen flex items-center justify-center"
   >
+    <audio id="myAudio">
+      <source src="http://localhost:3000/audio?id=song.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
     <div class="relative w-96 h-[500px] rounded-xl overflow-hidden shadow-lg">
       <img
         src="https://i.imgur.com/mcPLHv6.jpeg"
         alt="borrego_cosmico"
         class="absolute inset-0 w-300 h-500 object-cover opacity-50"
+        id="bg"
       />
       <div
         class="absolute inset-0 flex flex-col justify-center items-center text-white drop-shadow-md p-6"
@@ -30,4 +35,19 @@
       </div>
     </div>
   </body>
+  <script>
+    const audioElement = document.getElementById("myAudio");
+
+    // Verificar errores de carga
+    audioElement.addEventListener("error", (e) => {
+      console.error("Error al cargar el audio:", e);
+    });
+
+    // Reproducir audio al hacer clic en la imagen
+    document.querySelector("#bg").addEventListener("click", () => {
+      audioElement.play().catch((error) => {
+        console.error("Error al reproducir audio:", error);
+      });
+    });
+  </script>
 </html>

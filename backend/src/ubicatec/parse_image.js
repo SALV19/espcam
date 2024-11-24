@@ -163,7 +163,7 @@ async function imageRecognition() {
             console.log("Classifier info:", stderr);
           }
           if (stdout) {
-            // console.log("Classifier output:\n", stdout);
+            console.log("Classifier output:\n", stdout);
             resolve(stdout);
           }
         },

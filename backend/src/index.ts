@@ -50,6 +50,37 @@ app.get("/uploads/:filename", (req: Request, res: Response) => {
   });
 });
 
+app.get("/audio", function (req: Request, res: Response) {
+  const fileId = req.query.id as string; // Asegúrate de que `id` es un string.
+  if (!fileId) {
+    res.status(400).send("Bad Request: Missing file ID");
+    return;
+  }
+
+  const filePath = __dirname + "/audio/" + fileId;
+
+  // Verificar si el archivo existe
+  fs.stat(filePath, (err, stats) => {
+    if (err || !stats.isFile()) {
+      res.status(404).send("File not found");
+      return;
+    }
+
+    // Configurar cabeceras adecuadas
+    res.setHeader("Content-Type", "audio/mpeg");
+
+    // Crear el stream y manejar errores
+    const rstream = fs.createReadStream(filePath);
+    rstream.on("error", (streamErr) => {
+      console.error("Stream error:", streamErr);
+      res.status(500).send("Internal Server Error");
+    });
+
+    // Enviar el archivo al cliente
+    rstream.pipe(res);
+  });
+});
+
 // Endpoint para recibir imágenes
 app.post(
   "/upload",
