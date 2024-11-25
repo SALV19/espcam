@@ -1,6 +1,6 @@
 // frontend/scripts/home.js
 function analyzeImg() {
-  fetch("http://localhost:3000/whereAmI")
+  fetch("/whereAmI")
     .then((response) => response.text())
     .then((data) => {
       const result = document.getElementById("result");
