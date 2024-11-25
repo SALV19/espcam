@@ -32,10 +32,7 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 app.get("/new_photo", async (req: Request, res: Response) => {
   try {
     if (!isProcessing || !currentResponse) {
-      return res.status(400).json({
-        success: false,
-        message: "No image waiting to be processed",
-      });
+      return res.status(400).send("No image waiting to be processed");
     }
 
     // Enviar respuesta al ESP32 que está esperando
@@ -87,11 +84,7 @@ app.get("/whereAmI", async (req: Request, res: Response) => {
 
     console.log("Location detected:", location);
 
-    res.status(200).json({
-      success: true,
-      message: "Location processed and sent to device",
-      location: location,
-    });
+    res.status(200).send(location);
   } catch (error: any) {
     console.error("Error in whereAmI:", error);
     res.status(500).json({
