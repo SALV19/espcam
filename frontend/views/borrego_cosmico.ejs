@@ -8,6 +8,7 @@
   </head>
   <body
     class="bg-gradient-to-br from-orange-400 via-pink-400 to-blue-500 min-h-screen flex items-center justify-center"
+    id="borrego"
   >
     <audio id="myAudio">
       <source
@@ -38,19 +39,16 @@
       </div>
     </div>
   </body>
+
   <script>
-    const audioElement = document.getElementById("myAudio");
+    const x = document.querySelector("#myAudio");
 
-    // Verificar errores de carga
-    audioElement.addEventListener("error", (e) => {
-      console.error("Error al cargar el audio:", e);
-    });
-
-    // Reproducir audio al hacer clic en la imagen
-    document.querySelector("#bg").addEventListener("click", () => {
-      audioElement.play().catch((error) => {
-        console.error("Error al reproducir audio:", error);
-      });
+    function playAudio() {
+      x.play();
+    }
+    const img = document.querySelector("#borrego");
+    img.addEventListener("click", () => {
+      playAudio();
     });
   </script>
 </html>
