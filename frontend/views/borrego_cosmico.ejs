@@ -9,9 +9,13 @@
   <body
     class="bg-gradient-to-br from-orange-400 via-pink-400 to-blue-500 min-h-screen flex items-center justify-center"
     id="borrego"
+    id="borrego"
   >
     <audio id="myAudio">
-      <source src="http://localhost:3000/audio?id=song.mp3" type="audio/mpeg" />
+      <source
+        src="http://localhost:3000/audio?id=borregoAudio.mp3"
+        type="audio/mpeg"
+      />
       Your browser does not support the audio element.
     </audio>
     <div class="relative w-96 h-[500px] rounded-xl overflow-hidden shadow-lg">
@@ -34,16 +38,17 @@
         </p>
       </div>
     </div>
-    <script>
-      const x = document.querySelector("#myAudio");
-
-      function playAudio() {
-        x.play();
-      }
-      const img = document.querySelector("#borrego");
-      img.addEventListener("click", () => {
-        playAudio();
-      });
-    </script>
   </body>
+
+  <script>
+    const x = document.querySelector("#myAudio");
+
+    function playAudio() {
+      x.play();
+    }
+    const img = document.querySelector("#borrego");
+    img.addEventListener("click", () => {
+      playAudio();
+    });
+  </script>
 </html>

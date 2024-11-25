@@ -89,6 +89,13 @@
         const resultDiv = document.getElementById("result");
         resultDiv.textContent = "Analizando imagen...";
 
+        fetch("/new_photo")
+          .then((response) => console.log(response))
+          .catch((error) => {
+            alert("Error: " + error);
+            console.log(error);
+            return;
+          });
         fetch("http://localhost:3000/whereAmI")
           .then((response) => response.text())
           .then((data) => {
