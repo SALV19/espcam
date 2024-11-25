@@ -16,6 +16,9 @@ interface UploadResponse {
 
 const UPLOAD_DIR = path.join(__dirname, "/ubicatec"); // Directory to store images
 
+let isProcessing = false;
+let currentResponse: Response | null = null;
+
 app.use(
   "/scripts",
   express.static(path.join(__dirname, "../../frontend/scripts")),
@@ -26,22 +29,61 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR);
 }
 
-app.get("/whereAmI", (req: Request, res: Response) => {
+app.get("/whereAmI", async (req: Request, res: Response) => {
   try {
-    const get = async () => {
-      const response = await imageRecognition().then((e: any) => e);
-      const startIndex = response.indexOf("'") + 1; // +1 to exclude the start character
-      const endIndex = response.indexOf(",", startIndex) - 1;
+    if (!isProcessing || !currentResponse) {
+      return res.status(400).json({
+        success: false,
+        message: "No image waiting to be processed",
+      });
+    }
 
-      const answer = response.substring(startIndex, endIndex);
-      console.log(answer);
+    const response = await imageRecognition();
+    const startIndex = response.indexOf("'") + 1;
+    const endIndex = response.indexOf(",", startIndex) - 1;
+    const location = response.substring(startIndex, endIndex);
 
-      // const resObj = JSON.parse(response);
-      res.status(200).send(answer);
+    console.log("Location detected:", location);
+
+    // Enviar respuesta al ESP32 que está esperando
+    const uploadResponse: UploadResponse = {
+      success: true,
+      message: "Image processed successfully",
+      location: location,
     };
-    get();
+
+    currentResponse.status(200).json(uploadResponse);
+
+    // Resetear el estado
+    isProcessing = false;
+    currentResponse = null;
+
+    // Responder a la llamada whereAmI
+    res.status(200).json({
+      success: true,
+      message: "Location processed and sent to device",
+      location: location,
+    });
   } catch (error) {
-    res.status(400).send("error: " + error);
+    console.error("Error in whereAmI:", error);
+
+    if (currentResponse) {
+      const uploadResponse: UploadResponse = {
+        success: false,
+        message: "Error processing the image",
+        error: error.toString(),
+      };
+      currentResponse.status(500).json(uploadResponse);
+
+      isProcessing = false;
+      currentResponse = null;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error processing location",
+      error: error.toString(),
+    });
   }
 });
 
@@ -102,44 +144,33 @@ app.post(
         return res.status(400).json(response);
       }
 
+      if (isProcessing) {
+        const response: UploadResponse = {
+          success: false,
+          message: "Server is currently processing another image",
+          error: "Server busy",
+        };
+        return res.status(429).json(response);
+      }
+
+      isProcessing = true;
+      currentResponse = res;
+
       console.log("Image received. Size:", req.body.length);
       const imageName = "received_image.jpg";
       const imagePath = path.join(UPLOAD_DIR, imageName);
 
-      // Save the image
       await fs.promises.writeFile(imagePath, req.body);
+      console.log("Image saved, waiting for processing...");
 
-      try {
-        // Process image with image recognition
-        const recognitionResult = await imageRecognition();
-
-        // Extract location from recognition result
-        const startIndex = recognitionResult.indexOf("'") + 1;
-        const endIndex = recognitionResult.indexOf(",", startIndex) - 1;
-        const location = recognitionResult.substring(startIndex, endIndex);
-
-        // Prepare response for ESP32
-        const response: UploadResponse = {
-          success: true,
-          message: "Image processed successfully",
-          location: location,
-        };
-
-        // Send structured response
-        res.status(200).json(response);
-      } catch (recognitionError) {
-        const response: UploadResponse = {
-          success: false,
-          message: "Image saved but processing failed",
-          error: recognitionError.toString(),
-        };
-        res.status(500).json(response);
-      }
+      // No enviamos respuesta aquí - esperaremos a que whereAmI la procese
     } catch (error) {
+      isProcessing = false;
+      currentResponse = null;
       console.error("Error:", error);
       const response: UploadResponse = {
         success: false,
-        message: "Error processing the image",
+        message: "Error saving the image",
         error: error.toString(),
       };
       res.status(500).json(response);
