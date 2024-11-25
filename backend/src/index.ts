@@ -3,6 +3,7 @@ import viewRoutes from "./routes/view";
 import path from "path";
 import fs from "fs";
 
+//@ts-ignore
 const imageRecognition = require("./ubicatec/parse_image");
 const express = require("express");
 const app = express();
