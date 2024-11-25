@@ -7,6 +7,13 @@ const imageRecognition = require("./ubicatec/parse_image");
 const express = require("express");
 const app = express();
 
+interface UploadResponse {
+  success: boolean;
+  message: string;
+  location?: string;
+  error?: string;
+}
+
 const UPLOAD_DIR = path.join(__dirname, "/ubicatec"); // Directory to store images
 
 app.use(
@@ -81,26 +88,61 @@ app.get("/audio", function (req: Request, res: Response) {
   });
 });
 
-// Endpoint para recibir imágenes
 app.post(
   "/upload",
   express.raw({ type: "image/jpeg", limit: "10mb" }),
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
       if (!req.body || req.body.length === 0) {
-        return res.status(400).send("No image received");
+        const response: UploadResponse = {
+          success: false,
+          message: "No image received",
+          error: "Empty request body",
+        };
+        return res.status(400).json(response);
       }
 
       console.log("Image received. Size:", req.body.length);
       const imageName = "received_image.jpg";
       const imagePath = path.join(UPLOAD_DIR, imageName);
 
-      // Save the image to the uploads directory
-      fs.writeFileSync(imagePath, req.body);
-      res.status(200).send("Success!");
+      // Save the image
+      await fs.promises.writeFile(imagePath, req.body);
+
+      try {
+        // Process image with image recognition
+        const recognitionResult = await imageRecognition();
+
+        // Extract location from recognition result
+        const startIndex = recognitionResult.indexOf("'") + 1;
+        const endIndex = recognitionResult.indexOf(",", startIndex) - 1;
+        const location = recognitionResult.substring(startIndex, endIndex);
+
+        // Prepare response for ESP32
+        const response: UploadResponse = {
+          success: true,
+          message: "Image processed successfully",
+          location: location,
+        };
+
+        // Send structured response
+        res.status(200).json(response);
+      } catch (recognitionError) {
+        const response: UploadResponse = {
+          success: false,
+          message: "Image saved but processing failed",
+          error: recognitionError.toString(),
+        };
+        res.status(500).json(response);
+      }
     } catch (error) {
       console.error("Error:", error);
-      res.status(500).send("Error processing the image");
+      const response: UploadResponse = {
+        success: false,
+        message: "Error processing the image",
+        error: error.toString(),
+      };
+      res.status(500).json(response);
     }
   },
 );
