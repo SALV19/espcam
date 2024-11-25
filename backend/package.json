@@ -20,7 +20,7 @@
   "license": "MIT",
   "description": "Proyecto express",
   "dependencies": {
-
+    "canvas": "^2.11.2",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
