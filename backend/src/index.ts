@@ -96,8 +96,8 @@ app.get("/whereAmI", async (req: Request, res: Response) => {
 });
 
 app.get("/uploads/:filename", (req: Request, res: Response) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, "uploads", filename);
+  const filename = "received_image.jpg";
+  const filePath = path.join(__dirname, "/ubicatec", filename);
 
   res.sendFile(filePath, (err) => {
     if (err) {
