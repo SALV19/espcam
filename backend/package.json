@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc && cp src/ubicatec/*.wasm dist/ubicatec/ && cp src/audio/*.mp3 dist/audio/",
+    "build": "tsc && cp src/ubicatec/*.wasm dist/ubicatec/ && cp src/audio/*.mp3",
     "start": "node dist/index.js",
     "lint": "eslint .",
     "dev": "nodemon",
