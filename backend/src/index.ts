@@ -120,7 +120,7 @@ app.get("/audio", function (req: Request, res: Response) {
   // Verificar si el archivo existe
   fs.stat(filePath, (err, stats) => {
     if (err) {
-      res.status(403).send("File error");
+      res.status(403).send(err);
       return;
     } else if (!stats.isFile()) {
       res.status(404).send("File not found");
