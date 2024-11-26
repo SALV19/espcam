@@ -115,7 +115,6 @@ app.get("/audio", function (req: Request, res: Response) {
   }
 
   const filePath = __dirname + "/audio/" + fileId;
-  console.log(filePath);
 
   // Verificar si el archivo existe
   fs.stat(filePath, (err, stats) => {
@@ -123,6 +122,7 @@ app.get("/audio", function (req: Request, res: Response) {
       res.status(404).send("File not found");
       return;
     }
+    console.log(filePath);
 
     // Configurar cabeceras adecuadas
     res.setHeader("Content-Type", "audio/mpeg");
