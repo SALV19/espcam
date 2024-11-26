@@ -18,6 +18,7 @@ const UPLOAD_DIR = path.join(__dirname, "/ubicatec"); // Directory to store imag
 
 let isProcessing = false;
 let currentResponse: Response | null = null;
+let contador_imgs = 0;
 
 app.use(
   "/scripts",
@@ -145,6 +146,7 @@ app.post(
   "/upload",
   express.raw({ type: "image/jpeg", limit: "10mb" }),
   async (req: Request, res: Response) => {
+    console.log(contador_imgs++);
     try {
       if (!req.body || req.body.length === 0) {
         const response: UploadResponse = {
